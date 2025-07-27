@@ -8,5 +8,6 @@
         x:Class="ChessApp.ChessWindow"
         Title="ChessApp">
     <Canvas x:Name="GameCanvas" Width="640" Height="640"
-            PointerPressed="OnPointerPressed"/>
+            PointerPressed="OnPointerPressed">
+    </Canvas>
 </Window>

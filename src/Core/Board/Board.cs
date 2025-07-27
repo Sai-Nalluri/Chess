@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Chess.Core;
@@ -148,6 +149,7 @@ public class Board
         KingSquare = new int[2];
 
         plyCount = 0;
+        playerColor = Piece.White;
 
         Pawns = new PieceList[] { new PieceList(8), new PieceList(8) };
         Knights = new PieceList[] { new PieceList(10), new PieceList(10) };

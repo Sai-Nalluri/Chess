@@ -70,6 +70,7 @@ C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\ChessApp.AssemblyInfoInputs.cache
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\ChessApp.AssemblyInfo.cs
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\ChessApp.csproj.CoreCompileInputs.cache
+C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\ChessApp.sourcelink.json
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\ChessApp.csproj.Up2Date
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\ChessApp.dll
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\ChessApp\obj\Debug\net9.0\refint\ChessApp.dll

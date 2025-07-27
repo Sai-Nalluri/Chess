@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Chess.Core;
@@ -13,15 +16,18 @@ namespace ChessApp;
 public partial class ChessWindow : Window
 {
     // Square colors
-    private SolidColorBrush lightColor = new SolidColorBrush(Color.Parse("#F1D9C0"));
-    private SolidColorBrush darkColor = new SolidColorBrush(Color.Parse("#A97A65"));
-    private SolidColorBrush selectionOverlayColor = new SolidColorBrush(Color.FromArgb(150, 255, 255, 0));
-    private SolidColorBrush legalMoveOverlyColor = new SolidColorBrush(Color.FromArgb(150, 255, 0, 0));
+    private SolidColorBrush lightColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#F1D9C0"));
+    private SolidColorBrush darkColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#A97A65"));
+    private SolidColorBrush selectionOverlayColor = new SolidColorBrush(Avalonia.Media.Color.FromArgb(150, 255, 255, 0));
+    private SolidColorBrush legalMoveOverlayColor = new SolidColorBrush(Avalonia.Media.Color.FromArgb(150, 255, 0, 0));
 
     private int selectedRank = -1;
     private int selectedFile = -1;
     private int selectedSquareIndex = -1;
     private int selectedPiece = -1;
+
+    private List<int> legalRanks = new List<int>();
+    private List<int> legalFiles = new List<int>();
 
     // Dictionary to refer to when loading in piece images
     private Dictionary<int, Bitmap> pieceImages = new Dictionary<int, Bitmap>();
@@ -142,16 +148,26 @@ public partial class ChessWindow : Window
         int squareIndex = rank * 8 + file;
         int piece = board.Square[squareIndex];
 
-        // If a piece was already selected
+        // Case 1: A piece is already selected
         if (selectedRank != -1 && selectedFile != -1)
         {
             int fromIndex = selectedSquareIndex;
             int toIndex = squareIndex;
 
+            // Clear previous selection highlight
             overlays[(selectedRank, selectedFile)].Fill = Brushes.Transparent;
+            foreach (int legalRank in legalRanks)
+            {
+                foreach (int legalFile in legalFiles)
+                {
+                    overlays[(legalRank, legalFile)].Fill = Brushes.Transparent;
+                }
+            }
+            legalRanks.Clear();
+            legalFiles.Clear();
 
-            // They selected one of their pieces and then they switch to another
-            if (Piece.PieceColor(selectedPiece) == Piece.PieceColor(piece) && piece != Piece.None)
+            // If the clicked square contains a piece of the same color, change selection
+            if (piece != Piece.None && Piece.PieceColor(piece) == board.moveColor)
             {
                 selectedRank = rank;
                 selectedFile = file;
@@ -159,7 +175,22 @@ public partial class ChessWindow : Window
                 selectedPiece = piece;
 
                 overlays[(rank, file)].Fill = selectionOverlayColor;
+
+                // Highlight new legal moves
+                foreach (Move move in legalMoves)
+                {
+                    if (move.startSquare == selectedSquareIndex)
+                    {
+                        int targetRank = move.targetSquare / 8;
+                        int targetFile = move.targetSquare % 8;
+
+                        legalRanks.Add(targetRank);
+                        legalFiles.Add(targetFile);
+                        overlays[(targetRank, targetFile)].Fill = legalMoveOverlayColor;
+                    }
+                }
             }
+            // Otherwise, try to move the selected piece
             else
             {
                 Move move = new Move(fromIndex, toIndex);
@@ -173,10 +204,9 @@ public partial class ChessWindow : Window
                 selectedRank = selectedFile = selectedSquareIndex = selectedPiece = -1;
             }
         }
-        // If a piece is not selected, try to select a piece
+        // Case 2: No piece is currently selected
         else
         {
-            // If clicked on a square with a piece, select and highlight it
             if (piece != Piece.None && Piece.PieceColor(piece) == board.moveColor)
             {
                 selectedRank = rank;
@@ -185,9 +215,24 @@ public partial class ChessWindow : Window
                 selectedPiece = piece;
 
                 overlays[(rank, file)].Fill = selectionOverlayColor;
+
+                // Highlight legal moves for this piece
+                foreach (Move move in legalMoves)
+                {
+                    if (move.startSquare == selectedSquareIndex)
+                    {
+                        int targetRank = move.targetSquare / 8;
+                        int targetFile = move.targetSquare % 8;
+
+                        legalRanks.Add(targetRank);
+                        legalFiles.Add(targetFile);
+                        overlays[(targetRank, targetFile)].Fill = legalMoveOverlayColor;
+                    }
+                }
             }
         }
     }
+
 
     private void LoadPieceImages()
     {
