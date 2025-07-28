@@ -39,6 +39,9 @@ public class Board
     // Based on color
     public ulong[] colorBitboards = new ulong[2];
     public ulong allPiecesBitboard;
+    // Where sliding pieces are for legal move generation
+    public ulong friendlyOrthogonalSliders;
+    public ulong friendlyDiagonalSliders;
 
     // Total move count
     public int plyCount;
@@ -92,7 +95,7 @@ public class Board
 
         // Update the piece bitboards
         allPiecesBitboard = colorBitboards[WhiteIndex] | colorBitboards[BlackIndex];
-
+        UpdateSliderBitboards();
     }
 
     // Load the start position
@@ -117,7 +120,7 @@ public class Board
         {
             int piece = posInfo.squares[squareIndex];
             int pieceType = Piece.PieceType(piece);
-            int colorIndex = Piece.IsWhite(piece) ? 0 : 1;
+            int colorIndex = Piece.PieceColor(piece) == Piece.White ? 0 : 1;
             Square[squareIndex] = piece;
 
             if (piece != Piece.None)
@@ -143,6 +146,15 @@ public class Board
         allPiecesBitboard = colorBitboards[WhiteIndex] | colorBitboards[BlackIndex];
     }
 
+    void UpdateSliderBitboards()
+    {
+        int friendlyRook = Piece.MakePiece(Piece.Rook, Piece.White);
+        int friendlyBishop = Piece.MakePiece(Piece.Bishop, Piece.White);
+        int friendlyQueen = Piece.MakePiece(Piece.Queen, Piece.White);
+        friendlyOrthogonalSliders = pieceBitboards[friendlyRook] | pieceBitboards[friendlyQueen];
+        friendlyDiagonalSliders = pieceBitboards[friendlyBishop] | pieceBitboards[friendlyQueen];
+    }
+
     void Initialize()
     {
         Square = new int[64];
@@ -158,6 +170,11 @@ public class Board
         Queens = new PieceList[] { new PieceList(9), new PieceList(9) };
 
         pieceLists = new PieceList[Piece.MaxPieceIndex + 1];
+        // Initialize all entries to avoid null reference
+        for (int i = 0; i <= Piece.MaxPieceIndex; i++)
+        {
+            pieceLists[i] = new PieceList(1);
+        }
         pieceLists[Piece.WhitePawn] = Pawns[WhiteIndex];
         pieceLists[Piece.WhiteKnight] = Knights[WhiteIndex];
         pieceLists[Piece.WhiteBishop] = Bishops[WhiteIndex];
@@ -175,5 +192,7 @@ public class Board
         pieceBitboards = new ulong[Piece.MaxPieceIndex + 1];
         colorBitboards = new ulong[2];
         allPiecesBitboard = 0;
+        friendlyOrthogonalSliders = 0;
+        friendlyDiagonalSliders = 0;
     }
 }

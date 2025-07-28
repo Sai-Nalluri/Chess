@@ -24,18 +24,19 @@ public class MoveGenerator
     // ref means I can change the value of the argument instead or reading from it
     public List<Move> GenerateMoves(Board board)
     {
+        this.board = board; // Ensure board field is set
         moves = new List<Move>();
         Init();
 
         for (int squareIndex = 0; squareIndex < 64; squareIndex++)
         {
             int piece = board.Square[squareIndex];
-            if (piece == 0) continue;
+            if (piece == Piece.None) continue;
             if (Piece.PieceColor(piece) == board.moveColor)
             {
                 if (Piece.IsSlidingPiece(piece))
                 {
-                    GenerateSlidingMoves(squareIndex, piece);
+                    GenerateSlidingMoves(squareIndex, moves);
                 }
             }
         }
@@ -43,11 +44,38 @@ public class MoveGenerator
         return moves;
     }
 
-    void GenerateSlidingMoves(int startSquare, int piece)
+    void GenerateSlidingMoves(int startSquare, List<Move> moves)
     {
-        for (int directionIndex = 0; directionIndex < 8; directionIndex++)
-        {
+        int startDirectionIndex = Piece.PieceType(board.Square[startSquare]) == Piece.Bishop ? 4 : 0;
+        int endDirectionIndex = Piece.PieceType(board.Square[startSquare]) == Piece.Rook ? 4 : 8;
 
+        for (int directionIndex = startDirectionIndex; directionIndex < endDirectionIndex; directionIndex++)
+        {
+            for (int n = 0; n < PrecomputedMoveData.numSquaresToEdge[startSquare][directionIndex]; n++)
+            {
+                int targetSquare = startSquare + PrecomputedMoveData.directionOffsets[directionIndex] * (n + 1);
+                int targetedPiece = board.Square[targetSquare];
+
+                if (targetedPiece == Piece.None)
+                {
+                    moves.Add(new Move(startSquare, targetSquare));
+                    continue;
+                }
+
+                // If the piece on the square is the same color, go to the next direction
+                if (Piece.PieceColor(targetedPiece) == board.moveColor)
+                {
+                    break;
+                }
+
+                moves.Add(new Move(startSquare, targetSquare));
+
+                // If landing on a opponent piece, you cant go further
+                if (Piece.PieceColor(targetedPiece) != board.moveColor)
+                {
+                    break;
+                }
+            }
         }
     }
 

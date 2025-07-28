@@ -44,5 +44,7 @@ public static class Piece
     public static bool IsWhite(int piece) => IsColor(piece, White);
     public static int PieceType(int piece) => piece & TypeMask;
     public static int PieceColor(int piece) => piece & ColorMask;
-    public static bool IsSlidingPiece(int piece) => piece == Queen || piece == Rook || piece == Bishop;
+    public static bool IsSlidingPiece(int piece) => PieceType(piece) is Queen or Rook or Bishop;
+    public static bool IsOthogonalSlidingPiece(int piece) => PieceType(piece) is Queen or Rook;
+    public static bool IsDiagonalSlidingPiece(int piece) => PieceType(piece) is Queen or Bishop;
 }

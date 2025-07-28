@@ -1,4 +1,5 @@
 using System.IO;
+using System.Numerics;
 
 namespace Chess.Core;
 
@@ -49,6 +50,14 @@ public static class BitBoardUtility
         {
             return bitboard >> -numToShift;
         }
+    }
+
+    // Return the index of where the first 1 is set from the right
+    public static int PopLSB(ref ulong bitboard)
+    {
+        int trailingZeroCount = BitOperations.TrailingZeroCount(bitboard);
+        bitboard &= bitboard - 1;
+        return trailingZeroCount;
     }
 
     public static bool IsSet(ulong bitboard, int squareIndex)

@@ -44,7 +44,7 @@ public partial class ChessWindow : Window
     {
         InitializeComponent();
         LoadPieceImages();
-        board.LoadStartPosition();
+        board.LoadPosition("rqb5/8/8/8/8/8/8/5BQR w - - 0 1");
 
         Window window = new Window();
         window.WindowState = WindowState.Maximized;
