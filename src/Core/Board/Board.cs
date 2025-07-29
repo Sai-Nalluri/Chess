@@ -80,7 +80,13 @@ public class Board
         {
             int captureSquare = targetSquare;
 
-            pieceLists[capturedPiece].RemovePieceAtSquare(captureSquare);
+            // Skip piece list removal for kings since they use KingSquare array instead
+            if (capturedPieceType != Piece.King)
+            {
+                pieceLists[capturedPiece].RemovePieceAtSquare(captureSquare);
+            }
+            BitBoardUtility.ToggleSquare(ref pieceBitboards[capturedPiece], captureSquare);
+            BitBoardUtility.ToggleSquare(ref colorBitboards[opponentColorIndex], captureSquare);
         }
 
         // Handle king movement

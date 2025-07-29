@@ -9,6 +9,7 @@ public static class PrecomputedMoveData
     public static readonly int[][] numSquaresToEdge = new int[64][];
 
     public static readonly int[][] knightSquares = new int[64][];
+    public static readonly int[][] kingSquares = new int[64][];
 
     public static void ComputeMoveData()
     {
@@ -37,7 +38,7 @@ public static class PrecomputedMoveData
                     Math.Min(numToSouth, numToWest), // South West
                 ];
 
-                List<int> legalKnightJumps = new List<int>();
+                var legalKnightJumps = new List<int>();
                 foreach (int knightJumpOffset in allKnightJumpOffsets)
                 {
                     int knightJumpSquare = squareIndex + knightJumpOffset;
@@ -54,6 +55,24 @@ public static class PrecomputedMoveData
                     }
                 }
                 knightSquares[squareIndex] = legalKnightJumps.ToArray();
+
+                var legalKingMoves = new List<int>();
+                foreach (int kingMoveOffset in directionOffsets)
+                {
+                    int kingMoveSquare = squareIndex + kingMoveOffset;
+                    if (kingMoveSquare >= 0 && kingMoveSquare < 64)
+                    {
+                        int kingMoveRank = kingMoveSquare / 8;
+                        int kingMoveFile = kingMoveSquare % 8;
+                        // If the king moved more than one square, he wrapped around the board
+                        int maxMoveDistance = Math.Max(Math.Abs(rank - kingMoveRank), Math.Abs(file - kingMoveFile));
+                        if (maxMoveDistance == 1)
+                        {
+                            legalKingMoves.Add(kingMoveSquare);
+                        }
+                    }
+                }
+                kingSquares[squareIndex] = legalKingMoves.ToArray();
             }
         }
     }

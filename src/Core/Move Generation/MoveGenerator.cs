@@ -24,6 +24,7 @@ public class MoveGenerator
     ulong enemyPieces;
     ulong allPieceBitboards;
     int currentMoveIndex;
+    int friendlyKingSquare;
 
     Board board = new Board();
 
@@ -48,7 +49,19 @@ public class MoveGenerator
 
     void GenerateKingMoves(List<Move> moves)
     {
+        for (int index = 0; index < kingSquares[friendlyKingSquare].Count(); index++)
+        {
+            int targetSquare = kingSquares[friendlyKingSquare][index];
+            int pieceOnTargetSquare = board.Square[targetSquare];
 
+            if (Piece.IsColor(pieceOnTargetSquare, board.moveColorIndex))
+            {
+                continue;
+            }
+
+            moves.Add(new Move(friendlyKingSquare, targetSquare));
+            currentMoveIndex++;
+        }
     }
     void GenerateSlidingMoves(List<Move> moves)
     {
@@ -229,6 +242,7 @@ public class MoveGenerator
         opponentColor = board.opponentColor;
         friendlyColorIndex = board.moveColorIndex;
         opponentColorIndex = board.opponentColorIndex;
+        friendlyKingSquare = board.KingSquare[board.moveColorIndex];
 
         opponentPieceBitboard = board.colorBitboards[opponentColorIndex];
         friendlyPieceBitboard = board.colorBitboards[friendlyColorIndex];
