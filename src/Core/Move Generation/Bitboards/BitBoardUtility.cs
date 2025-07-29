@@ -1,5 +1,9 @@
+using System;
 using System.IO;
 using System.Numerics;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
 
 namespace Chess.Core;
 
@@ -15,7 +19,7 @@ public static class BitBoardUtility
     public const ulong Rank7 = Rank6 << 8;
     public const ulong Rank8 = Rank7 << 8;
 
-    public const ulong FileA = 0x101010101010101;
+    public const ulong FileA = 72340172838076673;
     public const ulong notAFile = ~FileA;
     public const ulong notHFile = ~(FileA << 7);
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Chess.Core;
 
@@ -7,8 +8,12 @@ public static class PrecomputedMoveData
     public static readonly int[] directionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
     public static readonly int[][] numSquaresToEdge = new int[64][];
 
+    public static readonly int[][] knightSquares = new int[64][];
+
     public static void ComputeMoveData()
     {
+        int[] allKnightJumpOffsets = { 15, 17, 6, 10, -10, -6, -17, -15 };
+
         for (int rank = 0; rank < 8; rank++)
         {
             for (int file = 0; file < 8; file++)
@@ -31,6 +36,24 @@ public static class PrecomputedMoveData
                     Math.Min(numToNorth, numToEast), // North East
                     Math.Min(numToSouth, numToWest), // South West
                 ];
+
+                List<int> legalKnightJumps = new List<int>();
+                foreach (int knightJumpOffset in allKnightJumpOffsets)
+                {
+                    int knightJumpSquare = squareIndex + knightJumpOffset;
+                    if (knightJumpSquare >= 0 && knightJumpSquare < 64)
+                    {
+                        int knightSquareRank = knightJumpSquare / 8;
+                        int knightSquareFile = knightJumpSquare % 8;
+                        // If the knight jumps more than 2 squares, that means it wraped around the board and is invalid
+                        int maxMoveDistance = Math.Max(Math.Abs(rank - knightSquareRank), Math.Abs(file - knightSquareFile));
+                        if (maxMoveDistance == 2)
+                        {
+                            legalKnightJumps.Add(knightJumpSquare);
+                        }
+                    }
+                }
+                knightSquares[squareIndex] = legalKnightJumps.ToArray();
             }
         }
     }

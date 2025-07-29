@@ -18,13 +18,15 @@ public partial class ChessWindow : Window
     // Square colors
     private SolidColorBrush lightColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#F1D9C0"));
     private SolidColorBrush darkColor = new SolidColorBrush(Avalonia.Media.Color.Parse("#A97A65"));
-    private SolidColorBrush selectionOverlayColor = new SolidColorBrush(Avalonia.Media.Color.FromArgb(150, 255, 255, 0));
-    private SolidColorBrush legalMoveOverlayColor = new SolidColorBrush(Avalonia.Media.Color.FromArgb(150, 255, 0, 0));
+    private SolidColorBrush selectionOverlayColor = new SolidColorBrush(Avalonia.Media.Color.FromArgb(180, 255, 255, 0));
+    private SolidColorBrush legalMoveOverlayColor = new SolidColorBrush(Avalonia.Media.Color.FromArgb(180, 255, 0, 0));
 
     private int selectedRank = -1;
     private int selectedFile = -1;
     private int selectedSquareIndex = -1;
     private int selectedPiece = -1;
+
+    private List<Move> legalMoves = new List<Move>(64);
 
     private List<int> legalRanks = new List<int>();
     private List<int> legalFiles = new List<int>();
@@ -34,8 +36,6 @@ public partial class ChessWindow : Window
     // Dictionary to refer to when trying to change overlays
     private Dictionary<(int rank, int file), Rectangle> overlays = new();
 
-    List<Move> legalMoves = new List<Move>();
-
     // Instances
     MoveGenerator moveGenerator = new MoveGenerator();
     Board board = new Board();
@@ -44,7 +44,9 @@ public partial class ChessWindow : Window
     {
         InitializeComponent();
         LoadPieceImages();
-        board.LoadPosition("rqb5/8/8/8/8/8/8/5BQR w - - 0 1");
+        board.LoadStartPosition();
+        // Test position
+        // board.LoadPosition("rqb5/7p/8/8/8/8/P7/5BQR w - - 0 1");
 
         Window window = new Window();
         window.WindowState = WindowState.Maximized;
@@ -132,7 +134,21 @@ public partial class ChessWindow : Window
 
     private bool IsLegal(Move move)
     {
-        return legalMoves.Contains(move);
+        foreach (Move legalMove in legalMoves)
+        {
+            if (legalMove.startSquare == move.startSquare)
+            {
+                if (legalMove.targetSquare == move.targetSquare)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
+        return false;
     }
 
     private void GenerateLegalMoves()
@@ -151,6 +167,24 @@ public partial class ChessWindow : Window
         // Case 1: A piece is already selected
         if (selectedRank != -1 && selectedFile != -1)
         {
+            // If the same square is clicked again, deselect immediately
+            if (selectedRank == rank && selectedFile == file)
+            {
+                overlays[(selectedRank, selectedFile)].Fill = Brushes.Transparent;
+                foreach (int legalRank in legalRanks)
+                {
+                    foreach (int legalFile in legalFiles)
+                    {
+                        overlays[(legalRank, legalFile)].Fill = Brushes.Transparent;
+                    }
+                }
+
+                selectedRank = selectedFile = selectedSquareIndex = selectedPiece = -1;
+                legalRanks.Clear();
+                legalFiles.Clear();
+                return;
+            }
+
             int fromIndex = selectedSquareIndex;
             int toIndex = squareIndex;
 
@@ -199,6 +233,8 @@ public partial class ChessWindow : Window
                     board.MakeMove(move);
                     DrawChessBoard();
                     GenerateLegalMoves();
+                    legalRanks.Clear();
+                    legalFiles.Clear();
                 }
 
                 selectedRank = selectedFile = selectedSquareIndex = selectedPiece = -1;

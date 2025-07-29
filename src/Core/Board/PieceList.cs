@@ -46,5 +46,8 @@ public class PieceList
         map[targetSquare] = pieceIndex;
     }
 
-    public int this[int index] => occupiedSquares[index];
+    public int this[int index]
+    {
+        get { return occupiedSquares[index]; }
+    }
 }
