@@ -45,6 +45,7 @@ public class Board
 
     // Total move count
     public int plyCount;
+    public int fiftyMoveRuleCounter;
 
     void MovePiece(int piece, int startSquare, int targetSquare)
     {
@@ -150,6 +151,11 @@ public class Board
 
         // Set extra bitboard
         allPiecesBitboard = colorBitboards[WhiteIndex] | colorBitboards[BlackIndex];
+
+        // Set up the gamestate
+        int whiteCastleRights = (posInfo.whiteCastleKingside ? 1 >> 3 : 0) | (posInfo.whiteCastleQueenside ? 1 >> 2 : 0);
+        int blackCastleRights = (posInfo.blackCastleKingside ? 1 >> 1 : 0) | (posInfo.blackCastleQueenside ? 1 : 0);
+        GameState currentGameState = new GameState(posInfo.epFile, whiteCastleRights | blackCastleRights, fiftyMoveRuleCounter);
     }
 
     void UpdateSliderBitboards()
@@ -167,6 +173,7 @@ public class Board
         KingSquare = new int[2];
 
         plyCount = 0;
+        fiftyMoveRuleCounter = 0;
         playerColor = Piece.White;
 
         Pawns = new PieceList[] { new PieceList(8), new PieceList(8) };
