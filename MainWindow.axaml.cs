@@ -52,6 +52,7 @@ public partial class ChessWindow : Window
         window.WindowState = WindowState.Maximized;
 
         DrawChessBoard();
+        DrawUIElements();
         GenerateLegalMoves();
     }
 
@@ -104,7 +105,15 @@ public partial class ChessWindow : Window
                 overlays[(rank, file)] = overlay;
 
                 // --DRAW PIECES--
-                int squareIndex = rank * 8 + file;
+                int squareIndex;
+                if (board.playerColor == Piece.Black)
+                {
+                    squareIndex = (7 - rank) * 8 + file;
+                }
+                else
+                {
+                    squareIndex = rank * 8 + file;
+                }
                 int piece = board.Square[squareIndex];
 
                 if (piece != Piece.None)
@@ -123,6 +132,66 @@ public partial class ChessWindow : Window
                 }
             }
         }
+    }
+
+    private void DrawUIElements()
+    {
+        Button playAsWhite = new Button
+        {
+            Content = "Play White",
+            Width = 175,
+            Height = 50,
+            FontSize = 24,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            VerticalContentAlignment = VerticalAlignment.Center,
+        };
+        Canvas.SetTop(playAsWhite, 445);
+        Canvas.SetLeft(playAsWhite, -275);
+        GameCanvas.Children.Add(playAsWhite);
+        playAsWhite.Click += PlayAsWhite;
+
+        Button playAsBlack = new Button
+        {
+            Content = "Play Black",
+            Width = 175,
+            Height = 50,
+            FontSize = 24,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            VerticalContentAlignment = VerticalAlignment.Center,
+        };
+        Canvas.SetTop(playAsBlack, 500);
+        Canvas.SetLeft(playAsBlack, -275);
+        GameCanvas.Children.Add(playAsBlack);
+        playAsBlack.Click += PlayAsBlack;
+
+        Button quitButton = new Button
+        {
+            Content = "Quit",
+            Width = 175,
+            Height = 50,
+            FontSize = 24,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            VerticalContentAlignment = VerticalAlignment.Center,
+        };
+        Canvas.SetTop(quitButton, 580);
+        Canvas.SetLeft(quitButton, -275);
+        GameCanvas.Children.Add(quitButton);
+        quitButton.Click += Quit;
+    }
+
+    private void PlayAsWhite(object? sender, RoutedEventArgs e)
+    {
+        Console.WriteLine("Trying to play as white");
+    }
+
+    private void PlayAsBlack(object? sender, RoutedEventArgs e)
+    {
+        Console.WriteLine("Trying to play as black");
+    }
+
+    private void Quit(object? sender, RoutedEventArgs e)
+    {
+        this.Close();
     }
 
     private (int rank, int file) GetBoardPosition(double x, double y)
@@ -232,6 +301,7 @@ public partial class ChessWindow : Window
                 {
                     board.MakeMove(move);
                     DrawChessBoard();
+                    DrawUIElements();
                     GenerateLegalMoves();
                     legalRanks.Clear();
                     legalFiles.Clear();
@@ -268,7 +338,6 @@ public partial class ChessWindow : Window
             }
         }
     }
-
 
     private void LoadPieceImages()
     {
