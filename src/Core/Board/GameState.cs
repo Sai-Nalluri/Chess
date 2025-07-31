@@ -11,7 +11,7 @@ public readonly struct GameState
     public const int BlackKingSideMask = 0b0010;
     public const int BlackQueenSideMask = 0b0001;
 
-    public GameState(int enPassantFile, int castlingRights, int fiftyMoveRule)
+    public GameState(int enPassantFile, int castlingRights)
     {
         this.enPassantFile = enPassantFile;
         this.castlingRights = castlingRights;

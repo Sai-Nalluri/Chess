@@ -47,6 +47,8 @@ public class Board
     public int plyCount;
     public int fiftyMoveRuleCounter;
 
+    public GameState currentGameState;
+
     void MovePiece(int piece, int startSquare, int targetSquare)
     {
         // Update the bitboards
@@ -73,6 +75,11 @@ public class Board
         int capturedPiece = Square[targetSquare];
         int capturedPieceType = Piece.PieceType(capturedPiece);
 
+        int previousCastleRight = currentGameState.castlingRights;
+        int previousEnPassantFile = currentGameState.enPassantFile;
+        int newCastleRights = previousCastleRight;
+        int newEnPassantFile = 0;
+
         // Update the bitboards, arrays and piece lists. The special cases are handled after
         MovePiece(movedPiece, startSquare, targetSquare);
 
@@ -96,9 +103,43 @@ public class Board
             KingSquare[moveColorIndex] = targetSquare;
         }
 
+        // If a pawn has moved up two squares, then that square in en passantable
+        if (flag == Move.PawnTwoUpFlag)
+        {
+            // Since we set new enpassant square to 0, this should not be zero
+            int file = BoardHelper.FileIndex(startSquare) + 1;
+            newEnPassantFile = file;
+        }
+
+        // Update the castle rights
+        if (previousCastleRight != 0)
+        {
+            // Any piece moving to/from rook squares means no castling rights that side
+            // Since if anything moving from, rook move and moving to means captured
+            if (targetSquare == BoardHelper.H1 || startSquare == BoardHelper.H1)
+            {
+                newCastleRights &= GameState.WhiteKingSideMask;
+            }
+            else if (targetSquare == BoardHelper.A1 || startSquare == BoardHelper.A1)
+            {
+                newCastleRights &= GameState.WhiteQueenSideMask;
+            }
+            else if (targetSquare == BoardHelper.H8 || startSquare == BoardHelper.H8)
+            {
+                newCastleRights &= GameState.BlackKingSideMask;
+            }
+            else if (targetSquare == BoardHelper.A8 || startSquare == BoardHelper.A8)
+            {
+                newCastleRights &= GameState.BlackQueenSideMask;
+            }
+        }
+
         // Change side to move
         isWhiteToMove = !isWhiteToMove;
         plyCount++;
+
+        GameState newGameState = new GameState(newEnPassantFile, newCastleRights);
+        currentGameState = newGameState;
 
         // Update the piece bitboards
         allPiecesBitboard = colorBitboards[WhiteIndex] | colorBitboards[BlackIndex];
@@ -155,7 +196,7 @@ public class Board
         // Set up the gamestate
         int whiteCastleRights = (posInfo.whiteCastleKingside ? 1 >> 3 : 0) | (posInfo.whiteCastleQueenside ? 1 >> 2 : 0);
         int blackCastleRights = (posInfo.blackCastleKingside ? 1 >> 1 : 0) | (posInfo.blackCastleQueenside ? 1 : 0);
-        GameState currentGameState = new GameState(posInfo.epFile, whiteCastleRights | blackCastleRights, fiftyMoveRuleCounter);
+        currentGameState = new GameState(posInfo.epFile, whiteCastleRights | blackCastleRights);
     }
 
     void UpdateSliderBitboards()
