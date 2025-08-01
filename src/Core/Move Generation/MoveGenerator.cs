@@ -176,28 +176,6 @@ public class MoveGenerator
             moves.Add(new Move(startSquare, targetSquare));
             currentMoveIndex++;
         }
-
-        // Plain promotions
-        while (pushPromotions != 0)
-        {
-            int targetSquare = BitBoardUtility.PopLSB(ref pushPromotions);
-            int startSquare = targetSquare - pushOffset;
-            GeneratePromotions(startSquare, targetSquare, moves);
-        }
-
-        while (capturePromotionA != 0)
-        {
-            int targetSquare = BitBoardUtility.PopLSB(ref capturePromotionA);
-            int startSquare = targetSquare - pushDir * 7;
-            GeneratePromotions(startSquare, targetSquare, moves);
-        }
-
-        while (capturePromotionB != 0)
-        {
-            int targetSquare = BitBoardUtility.PopLSB(ref capturePromotionB);
-            int startSquare = targetSquare - pushDir * 9;
-            GeneratePromotions(startSquare, targetSquare, moves);
-        }
     }
 
     void GeneratePromotions(int startSquare, int targetSquare, List<Move> moves)
