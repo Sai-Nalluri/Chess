@@ -7,6 +7,11 @@ public static class PrecomputedMoveData
 {
     public static readonly int[] directionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
     public static readonly int[][] numSquaresToEdge = new int[64][];
+    // Not indexes, directions in numSquareToEdge
+    public static readonly int[][] pawnAttackDirections = {
+        new int[] {4, 6},
+        new int[] {7, 5}
+    };
 
     public static readonly int[][] knightSquares = new int[64][];
     public static readonly int[][] kingSquares = new int[64][];
@@ -27,16 +32,15 @@ public static class PrecomputedMoveData
 
                 int squareIndex = rank * 8 + file;
 
-                numSquaresToEdge[squareIndex] = [
-                    numToNorth,
-                    numToSouth,
-                    numToWest,
-                    numToEast,
-                    Math.Min(numToNorth, numToWest), // North West
-                    Math.Min(numToSouth, numToEast), // South East
-                    Math.Min(numToNorth, numToEast), // North East
-                    Math.Min(numToSouth, numToWest), // South West
-                ];
+                numSquaresToEdge[squareIndex] = new int[8];
+                numSquaresToEdge[squareIndex][0] = numToNorth;
+                numSquaresToEdge[squareIndex][1] = numToSouth;
+                numSquaresToEdge[squareIndex][2] = numToWest;
+                numSquaresToEdge[squareIndex][3] = numToEast;
+                numSquaresToEdge[squareIndex][4] = Math.Min(numToNorth, numToWest);
+                numSquaresToEdge[squareIndex][5] = Math.Min(numToSouth, numToEast);
+                numSquaresToEdge[squareIndex][6] = Math.Min(numToNorth, numToEast);
+                numSquaresToEdge[squareIndex][7] = Math.Min(numToSouth, numToWest);
 
                 var legalKnightJumps = new List<int>();
                 foreach (int knightJumpOffset in allKnightJumpOffsets)

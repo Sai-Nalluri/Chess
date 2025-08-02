@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Chess.Core.PrecomputedMoveData;
+using static Chess.Core.BoardHelper;
 
 namespace Chess.Core;
 
@@ -54,7 +55,7 @@ public class MoveGenerator
             int targetSquare = kingSquares[friendlyKingSquare][index];
             int pieceOnTargetSquare = board.Square[targetSquare];
 
-            if (Piece.IsColor(pieceOnTargetSquare, board.moveColorIndex))
+            if (Piece.IsColor(pieceOnTargetSquare, friendlyColorIndex))
             {
                 continue;
             }
@@ -65,19 +66,19 @@ public class MoveGenerator
     }
     void GenerateSlidingMoves(List<Move> moves)
     {
-        PieceList rooks = board.Rooks[board.moveColorIndex];
+        PieceList rooks = board.Rooks[friendlyColorIndex];
         for (int index = 0; index < rooks.Count; index++)
         {
             GenerateSlidingPiecesMoves(rooks[index], 0, 4, moves);
         }
 
-        PieceList bishops = board.Bishops[board.moveColorIndex];
+        PieceList bishops = board.Bishops[friendlyColorIndex];
         for (int index = 0; index < bishops.Count; index++)
         {
             GenerateSlidingPiecesMoves(bishops[index], 4, 8, moves);
         }
 
-        PieceList queens = board.Queens[board.moveColorIndex];
+        PieceList queens = board.Queens[friendlyColorIndex];
         for (int index = 0; index < queens.Count; index++)
         {
             GenerateSlidingPiecesMoves(queens[index], 0, 8, moves);
@@ -114,89 +115,87 @@ public class MoveGenerator
 
     void GeneratePawnMoves(List<Move> moves)
     {
-        int pushDir = board.isWhiteToMove ? 1 : -1;
+        PieceList pawns = board.Pawns[friendlyColorIndex];
+        int pushDir = isWhiteToMove ? 1 : -1;
         int pushOffset = pushDir * 8;
+        int startRank = isWhiteToMove ? 1 : 6;
+        int finalRankBeforePromotion = isWhiteToMove ? 6 : 1;
 
-        int friendlyPawnPiece = Piece.MakePiece(Piece.Pawn, board.moveColor);
-        ulong pawns = board.pieceBitboards[friendlyPawnPiece];
-
-        ulong singlePush = BitBoardUtility.Shift(pawns, pushOffset) & emptySquares;
-        ulong promotionRankMask = board.isWhiteToMove ? BitBoardUtility.Rank1 : BitBoardUtility.Rank8;
-
-        ulong pushPromotions = singlePush & promotionRankMask;
-
-        ulong singlePushNoPromotions = singlePush & ~promotionRankMask;
-
-        // Single and double push
-        while (singlePushNoPromotions != 0)
+        for (int index = 0; index < pawns.Count; index++)
         {
-            int targetSquare = BitBoardUtility.PopLSB(ref singlePushNoPromotions);
-            int startSquare = targetSquare - pushOffset;
-            moves.Add(new Move(startSquare, targetSquare));
-            currentMoveIndex++;
-        }
+            int startSquare = pawns[index];
+            int rank = RankIndex(startSquare);
+            bool oneStepFromPromotion = rank == finalRankBeforePromotion;
 
-        // This is where pawns would land if they were push 2 squares from the correct ranks
-        // & it to doublePush so only the right squares are made to a move
-        ulong doublePushTargetRankMask = board.isWhiteToMove ? BitBoardUtility.Rank4 : BitBoardUtility.Rank5;
-        ulong doublePush = BitBoardUtility.Shift(singlePush, pushOffset) & emptySquares & doublePushTargetRankMask;
+            int oneSquareForward = startSquare + pushOffset;
+            if (board.Square[oneSquareForward] == Piece.None)
+            {
+                if (oneStepFromPromotion)
+                {
+                    MakePromotionMove(startSquare, oneSquareForward, moves);
+                }
+                else
+                {
+                    moves.Add(new Move(startSquare, oneSquareForward));
+                    currentMoveIndex++;
+                }
 
-        while (doublePush != 0)
-        {
-            int targetSquare = BitBoardUtility.PopLSB(ref doublePush);
-            int startSquare = targetSquare - pushOffset * 2;
-            moves.Add(new Move(startSquare, targetSquare, Move.PawnTwoUpFlag));
-            currentMoveIndex++;
-        }
+                int twoSquareForward = oneSquareForward + pushOffset;
+                if (rank == startRank && board.Square[twoSquareForward] == Piece.None)
+                {
+                    moves.Add(new Move(startSquare, twoSquareForward, Move.PawnTwoUpFlag));
+                    currentMoveIndex++;
+                }
+            }
 
-        ulong captureEdgeFileMask1 = board.isWhiteToMove ? BitBoardUtility.notAFile : BitBoardUtility.notHFile;
-        ulong captureEdgeFileMask2 = board.isWhiteToMove ? BitBoardUtility.notHFile : BitBoardUtility.notAFile;
-        ulong captureA = BitBoardUtility.Shift(pawns & captureEdgeFileMask1, pushDir * 7) & enemyPieces;
-        ulong captureB = BitBoardUtility.Shift(pawns & captureEdgeFileMask2, pushDir * 9) & enemyPieces;
+            for (int j = 0; j < 2; j++)
+            {
+                if (numSquaresToEdge[startSquare][pawnAttackDirections[friendlyColorIndex][j]] > 0)
+                {
+                    int pawnCaptureDir = directionOffsets[pawnAttackDirections[friendlyColorIndex][j]];
+                    int targetSquare = startSquare + pawnCaptureDir;
+                    int targetPiece = board.Square[targetSquare];
 
-        ulong capturePromotionA = captureA & promotionRankMask;
-        ulong capturePromotionB = captureB & promotionRankMask;
-
-        captureA &= ~promotionRankMask;
-        captureB &= ~promotionRankMask;
-
-        // Captures with no promotion
-        while (captureA != 0)
-        {
-            int targetSquare = BitBoardUtility.PopLSB(ref captureA);
-            int startSquare = targetSquare - pushDir * 7;
-            moves.Add(new Move(startSquare, targetSquare));
-            currentMoveIndex++;
-        }
-
-        while (captureB != 0)
-        {
-            int targetSquare = BitBoardUtility.PopLSB(ref captureB);
-            int startSquare = targetSquare - pushDir * 9;
-            moves.Add(new Move(startSquare, targetSquare));
-            currentMoveIndex++;
+                    if (Piece.IsColor(targetPiece, opponentColor))
+                    {
+                        if (oneStepFromPromotion)
+                        {
+                            MakePromotionMove(startSquare, targetSquare, moves);
+                        }
+                        else
+                        {
+                            moves.Add(new Move(startSquare, targetSquare));
+                            currentMoveIndex++;
+                        }
+                    }
+                }
+            }
         }
     }
 
-    void GeneratePromotions(int startSquare, int targetSquare, List<Move> moves)
+    void MakePromotionMove(int startSquare, int targetSquare, List<Move> moves)
     {
         moves.Add(new Move(startSquare, targetSquare, Move.PromoteToQueenFlag));
-
+        currentMoveIndex++;
         if (promotionsToGenerate == PromotionMode.All)
         {
             moves.Add(new Move(startSquare, targetSquare, Move.PromoteToBishopFlag));
+            currentMoveIndex++;
             moves.Add(new Move(startSquare, targetSquare, Move.PromoteToRookFlag));
+            currentMoveIndex++;
             moves.Add(new Move(startSquare, targetSquare, Move.PromoteToKnightFlag));
+            currentMoveIndex++;
         }
         else if (promotionsToGenerate == PromotionMode.QueenAndKnight)
         {
             moves.Add(new Move(startSquare, targetSquare, Move.PromoteToKnightFlag));
+            currentMoveIndex++;
         }
     }
 
     void GenerateKnightMoves(List<Move> moves)
     {
-        PieceList knights = board.Knights[board.moveColorIndex];
+        PieceList knights = board.Knights[friendlyColorIndex];
         for (int index = 0; index < knights.Count; index++)
         {
             int startSquare = knights[index];
@@ -220,7 +219,7 @@ public class MoveGenerator
         opponentColor = board.opponentColor;
         friendlyColorIndex = board.moveColorIndex;
         opponentColorIndex = board.opponentColorIndex;
-        friendlyKingSquare = board.KingSquare[board.moveColorIndex];
+        friendlyKingSquare = board.KingSquare[friendlyColorIndex];
 
         opponentPieceBitboard = board.colorBitboards[opponentColorIndex];
         friendlyPieceBitboard = board.colorBitboards[friendlyColorIndex];

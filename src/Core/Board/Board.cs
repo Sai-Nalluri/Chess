@@ -78,7 +78,7 @@ public class Board
         int previousCastleRight = currentGameState.castlingRights;
         int previousEnPassantFile = currentGameState.enPassantFile;
         int newCastleRights = previousCastleRight;
-        int newEnPassantFile = 0;
+        int newEnPassantFile = -1;
 
         // Update the bitboards, arrays and piece lists. The special cases are handled after
         MovePiece(movedPiece, startSquare, targetSquare);
@@ -107,7 +107,7 @@ public class Board
         if (flag == Move.PawnTwoUpFlag)
         {
             // Since we set new enpassant square to 0, this should not be zero
-            int file = BoardHelper.FileIndex(startSquare) + 1;
+            int file = BoardHelper.FileIndex(startSquare);
             newEnPassantFile = file;
         }
 
