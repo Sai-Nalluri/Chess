@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Chess.Core;
+using Chess.Game;
 
 namespace Chess.UI;
 
@@ -18,10 +19,13 @@ public partial class BoardUI : Window
     Border[,] squareBorders = new Border[8, 8];
     Move lastMoveMade;
     MoveGenerator moveGenerator;
+    GameManager gameManager;
 
     public BoardUI()
     {
         InitializeComponent();
+        gameManager = new GameManager();
+        gameManager.Start();
 
         moveGenerator = new MoveGenerator();
         SetBoardThemes();
