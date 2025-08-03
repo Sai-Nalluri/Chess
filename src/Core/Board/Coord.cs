@@ -19,7 +19,7 @@ public readonly struct Coord
 
     public bool IsLightSquare()
     {
-        return (rankIndex + fileIndex) % 2 != 0;
+        return (rankIndex + fileIndex) % 2 == 0;
     }
 
     public int SquareIndex => BoardHelper.IndexFromCoord(this);
