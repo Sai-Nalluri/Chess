@@ -1,10 +1,10 @@
 using Avalonia.Media;
 namespace Chess.UI;
 
-public static class BoardTheme
+public class BoardTheme
 {
-    public static SquareColors lightSquares;
-    public static SquareColors darkSquares;
+    public SquareColors lightSquares;
+    public SquareColors darkSquares;
 
     public struct SquareColors
     {

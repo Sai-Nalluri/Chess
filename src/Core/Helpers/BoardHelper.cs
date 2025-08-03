@@ -31,4 +31,9 @@ public static class BoardHelper
     {
         return squareIndex % 8;
     }
+
+    public static int IndexFromCoord(Coord coord)
+    {
+        return coord.rankIndex * 8 + coord.fileIndex;
+    }
 }

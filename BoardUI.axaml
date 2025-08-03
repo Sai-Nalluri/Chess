@@ -5,9 +5,8 @@
         WindowState = "Maximized"
         Background = "rgba(62, 62, 62, 1)"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="ChessApp.ChessWindow"
-        Title="ChessApp">
-    <Canvas x:Name="GameCanvas" Width="640" Height="640"
-            PointerPressed="OnPointerPressed">
+        x:Class="Chess.UI.BoardUI"
+        Title="Chess.UI">
+    <Canvas x:Name="GameCanvas" Width="640" Height="640">
     </Canvas>
 </Window>
