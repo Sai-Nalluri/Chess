@@ -8,10 +8,10 @@ public class BoardTheme
 
     public struct SquareColors
     {
-        public Color normal;
-        public Color legal;
-        public Color selected;
-        public Color moveFromHighlight;
-        public Color moveToHighlight;
+        public SolidColorBrush normal;
+        public SolidColorBrush legal;
+        public SolidColorBrush selected;
+        public SolidColorBrush moveFromHighlight;
+        public SolidColorBrush moveToHighlight;
     }
 }
