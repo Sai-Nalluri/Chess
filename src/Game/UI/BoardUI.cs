@@ -89,7 +89,7 @@ public class BoardUI
         graphicalSquareColors[square.rankIndex, square.fileIndex] = square.IsLightSquare() ? boardTheme.lightSquares.normal : boardTheme.darkSquares.normal;
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public void Draw(SpriteBatch spriteBatch, Vector2 position)
     {
         for (int rank = 0; rank < 8; rank++)
         {
@@ -98,7 +98,13 @@ public class BoardUI
                 Rectangle square = graphicalSquares[rank, file];
                 Color color = graphicalSquareColors[rank, file];
 
-                UIHelper.DrawSquare(spriteBatch, square, color);
+                Rectangle offsetSquare = new Rectangle(
+                    (int)position.X + square.X,
+                    (int)position.Y + square.Y,
+                    square.Width,
+                    square.Height
+                );
+                UIHelper.DrawSquare(spriteBatch, offsetSquare, color);
             }
         }
     }

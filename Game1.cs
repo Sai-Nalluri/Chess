@@ -53,7 +53,11 @@ public class Game1 : Game
         GraphicsDevice.Clear(backgroundColor);
 
         _spriteBatch.Begin();
-        boardUI.Draw(_spriteBatch);
+        Vector2 centerPosition = new Vector2(
+            (_graphics.PreferredBackBufferWidth - 640) / 2,  // 640 = 8 squares * 80 pixels
+            (_graphics.PreferredBackBufferHeight - 640) / 2
+        );
+        boardUI.Draw(_spriteBatch, centerPosition);
         _spriteBatch.End();
 
         base.Draw(gameTime);

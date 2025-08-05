@@ -29,3 +29,4 @@ C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\ob
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net8.0\Chess.pdb
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net8.0\Chess.genruntimeconfig.cache
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net8.0\ref\Chess.dll
+C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net8.0\Chess.sourcelink.json
