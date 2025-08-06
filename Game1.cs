@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Chess.GameCore;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -12,6 +14,9 @@ public class Game1 : Game
     private static readonly Color backgroundColor = new Color(51, 51, 51);
 
     BoardUI boardUI;
+    GameManager gameManager;
+
+    Texture2D texture;
 
     public Game1()
     {
@@ -21,12 +26,12 @@ public class Game1 : Game
         Window.IsBorderless = true;
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        IsFixedTimeStep = true;
+        TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 120.0); // 120 FPS
     }
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-
         base.Initialize();
     }
 
@@ -34,8 +39,11 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+        texture = Content.Load<Texture2D>("chess pieces/white_pawn");
+
         UIHelper.Initialize(GraphicsDevice);
         boardUI = new BoardUI();
+        gameManager = new GameManager();
     }
 
     protected override void Update(GameTime gameTime)
@@ -44,6 +52,7 @@ public class Game1 : Game
         {
             Exit();
         }
+        gameManager.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -53,11 +62,14 @@ public class Game1 : Game
         GraphicsDevice.Clear(backgroundColor);
 
         _spriteBatch.Begin();
+
+        _spriteBatch.Draw(texture, new Vector2(100, 100), Color.White);
+
         Vector2 centerPosition = new Vector2(
-            (_graphics.PreferredBackBufferWidth - 640) / 2,  // 640 = 8 squares * 80 pixels
+            (_graphics.PreferredBackBufferWidth - 640) / 2,
             (_graphics.PreferredBackBufferHeight - 640) / 2
         );
-        boardUI.Draw(_spriteBatch, centerPosition);
+        boardUI.Awake(_spriteBatch, centerPosition);
         _spriteBatch.End();
 
         base.Draw(gameTime);

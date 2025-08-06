@@ -20,6 +20,8 @@ public class PieceTheme
                 return pieceSprites.knight;
             case Piece.Bishop:
                 return pieceSprites.bishop;
+            case Piece.Rook:
+                return pieceSprites.rook;
             case Piece.Queen:
                 return pieceSprites.queen;
             case Piece.King:
@@ -31,13 +33,13 @@ public class PieceTheme
 
     public class PieceSprites
     {
-        public Texture2D pawn, knight, bishop, queen, king;
+        public Texture2D pawn, knight, bishop, rook, queen, king;
 
         public Texture2D this[int i]
         {
             get
             {
-                return new Texture2D[] { pawn, knight, bishop, queen, king }[i];
+                return new Texture2D[] { pawn, knight, bishop, rook, queen, king }[i];
             }
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using Chess.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,16 +20,28 @@ public class BoardUI
     // Move lastMoveMade;
     MoveGenerator moveGenerator;
 
-    public BoardUI()
+    public void Awake(SpriteBatch spriteBatch, Vector2 position)
     {
         moveGenerator = new MoveGenerator();
-        SetBoardThemes();
-        InitializeSquareColors();
-        InitializeBoard();
+        Initialize();
+        CreateBoardUI(spriteBatch, position);
     }
 
-    void SetBoardThemes()
+    public void UpdatePosition(Board board)
     {
+        for (int rank = 0; rank < 8; rank++)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                Coord coord = new Coord(rank, file);
+                int piece = BoardHelper.IndexFromCoord(coord);
+            }
+        }
+    }
+
+    void Initialize()
+    {
+        // Set the board theme colors
         boardTheme.lightSquares.normal = new Color(238, 216, 192);
         boardTheme.lightSquares.legal = new Color(221, 89, 89);
         boardTheme.lightSquares.selected = new Color(236, 197, 123);
@@ -40,26 +53,12 @@ public class BoardUI
         boardTheme.darkSquares.selected = new Color(200, 158, 80);
         boardTheme.darkSquares.moveFromHighlight = new Color(197, 158, 94);
         boardTheme.darkSquares.moveToHighlight = new Color(197, 158, 94);
-    }
 
-    void InitializeSquareColors()
-    {
         for (int rank = 0; rank < 8; rank++)
         {
             for (int file = 0; file < 8; file++)
             {
-                bool isLight = (rank + file) % 2 == 0;
-                graphicalSquareColors[rank, file] = isLight ? boardTheme.lightSquares.normal : boardTheme.darkSquares.normal;
-            }
-        }
-    }
-
-    void InitializeBoard()
-    {
-        for (int rank = 0; rank < 8; rank++)
-        {
-            for (int file = 0; file < 8; file++)
-            {
+                // Populate square arrays
                 Rectangle square = new Rectangle
                 {
                     X = file * 80,
@@ -68,6 +67,30 @@ public class BoardUI
                     Height = 80
                 };
                 graphicalSquares[rank, file] = square;
+
+                // Populate square colors arrays
+                bool isLight = (rank + file) % 2 == 0;
+                graphicalSquareColors[rank, file] = isLight ? boardTheme.lightSquares.normal : boardTheme.darkSquares.normal;
+            }
+        }
+    }
+
+    void CreateBoardUI(SpriteBatch spriteBatch, Vector2 position)
+    {
+        for (int rank = 0; rank < 8; rank++)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                Rectangle square = graphicalSquares[rank, file];
+                Color color = graphicalSquareColors[rank, file];
+
+                Rectangle offsetSquare = new Rectangle(
+                    (int)position.X + square.X,
+                    (int)position.Y + square.Y,
+                    square.Width,
+                    square.Height
+                );
+                UIHelper.DrawSquare(spriteBatch, offsetSquare, color);
             }
         }
         ResetSquareColors();
@@ -87,25 +110,5 @@ public class BoardUI
     void SetSquareColors(Coord square)
     {
         graphicalSquareColors[square.rankIndex, square.fileIndex] = square.IsLightSquare() ? boardTheme.lightSquares.normal : boardTheme.darkSquares.normal;
-    }
-
-    public void Draw(SpriteBatch spriteBatch, Vector2 position)
-    {
-        for (int rank = 0; rank < 8; rank++)
-        {
-            for (int file = 0; file < 8; file++)
-            {
-                Rectangle square = graphicalSquares[rank, file];
-                Color color = graphicalSquareColors[rank, file];
-
-                Rectangle offsetSquare = new Rectangle(
-                    (int)position.X + square.X,
-                    (int)position.Y + square.Y,
-                    square.Width,
-                    square.Height
-                );
-                UIHelper.DrawSquare(spriteBatch, offsetSquare, color);
-            }
-        }
     }
 }
