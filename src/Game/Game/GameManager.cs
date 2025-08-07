@@ -72,5 +72,29 @@ public class GameManager
         }
         onPositionLoaded?.Invoke();
         boardUI.UpdatePosition(board);
+        boardUI.ResetSquareColors();
+
+        CreatePlayer(ref whitePlayer, whitePlayerType);
+        CreatePlayer(ref blackPlayer, blackPlayerType);
+    }
+
+    void CreatePlayer(ref Player player, PlayerType playerType)
+    {
+        /*
+        if (player != null)
+        {
+            player.onMoveChosen -= OnMoveChosen;
+        }
+
+        if (playerType == PlayerType.Human)
+        {
+            player = new HumanPlayer(board);
+        }
+        else
+        {
+            player = new AIPlayer(searchBoard, aiSettings);
+        }
+        player.onMoveChosen += OnMoveChosen;
+        */
     }
 }

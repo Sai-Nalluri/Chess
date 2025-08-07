@@ -16,6 +16,8 @@ public class Game1 : Game
     BoardUI boardUI;
     GameManager gameManager;
 
+    private bool hasStarted = false;
+
     Texture2D texture;
 
     public Game1()
@@ -44,6 +46,8 @@ public class Game1 : Game
         UIHelper.Initialize(GraphicsDevice);
         boardUI = new BoardUI();
         gameManager = new GameManager();
+
+        boardUI.Awake(_spriteBatch);
     }
 
     protected override void Update(GameTime gameTime)
@@ -52,6 +56,12 @@ public class Game1 : Game
         {
             Exit();
         }
+        if (!hasStarted)
+        {
+            gameManager.Start();
+            hasStarted = true;
+        }
+
         gameManager.Update(gameTime);
 
         base.Update(gameTime);
@@ -69,7 +79,8 @@ public class Game1 : Game
             (_graphics.PreferredBackBufferWidth - 640) / 2,
             (_graphics.PreferredBackBufferHeight - 640) / 2
         );
-        boardUI.Awake(_spriteBatch, centerPosition);
+        boardUI.CreateBoardUI(_spriteBatch, centerPosition);
+
         _spriteBatch.End();
 
         base.Draw(gameTime);

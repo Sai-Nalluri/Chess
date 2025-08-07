@@ -20,11 +20,10 @@ public class BoardUI
     // Move lastMoveMade;
     MoveGenerator moveGenerator;
 
-    public void Awake(SpriteBatch spriteBatch, Vector2 position)
+    public void Awake(SpriteBatch spriteBatch)
     {
         moveGenerator = new MoveGenerator();
         Initialize();
-        CreateBoardUI(spriteBatch, position);
     }
 
     public void UpdatePosition(Board board)
@@ -75,7 +74,7 @@ public class BoardUI
         }
     }
 
-    void CreateBoardUI(SpriteBatch spriteBatch, Vector2 position)
+    public void CreateBoardUI(SpriteBatch spriteBatch, Vector2 position)
     {
         for (int rank = 0; rank < 8; rank++)
         {
@@ -96,7 +95,7 @@ public class BoardUI
         ResetSquareColors();
     }
 
-    void ResetSquareColors()
+    public void ResetSquareColors()
     {
         for (int rank = 0; rank < 8; rank++)
         {
